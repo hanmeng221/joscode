@@ -42,6 +42,8 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	wire [31:2] next_pc;
 	wire pc_wr;
     wire pc_en;
+    //TEMP
+    assign pc_en = 1'b1;
     wire pc_work;
     
 	PC the_PC(clk, next_pc, pc_wr, pc_out, rst,pc_work,pc_en);
