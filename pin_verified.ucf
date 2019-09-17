@@ -5,7 +5,7 @@
 # OK
 NET "sys_clk"                  LOC = "AF13";   # 1Hz
 NET "refresh_clk"              LOC = "AD12";   # 1KHz
-NET "sys_rst"                  LOC = "K5";
+NET "sys_rst"                  LOC = "AD6";
 
 ## OK
 NET "din[0]"            LOC = "H3" ;    # 08

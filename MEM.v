@@ -41,8 +41,11 @@ module MEM(
     input rst_in,
     input [21:0] dm_addr,
     input dm_work,
+    input dm_we,
+    input [3:0] be_in,
     input [31:0] dm_datain,
     output [31:0] dm_dataout,
+    input im_work,
     input [21:0] im_addr,
     output [31:0] im_dataout,
     input boot,
@@ -51,6 +54,11 @@ module MEM(
     input uart_rxd,
     output uart_txd
     );
+
+//TODO dm_we mem_sram_rw
+
+deliver the_deliver(clk_in,rst_in,boot,mem_flash_done,mem_flash_data_rd,mem_flash_addr,mem_flash_cs,mem_sram_done,mem_sram_data_wr,mem_sram_addr,mem_sram_cs,start);
+
 
 mem_if the_mem_if(/*AUTOARG*/
   // Outputs

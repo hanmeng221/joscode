@@ -41,7 +41,10 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	////////////////////////////////////////////////////Phase F/////////////////
 	wire [31:2] next_pc;
 	wire pc_wr;
-	PC the_PC(clk, next_pc, pc_wr, pc_out, rst);
+    wire pc_en;
+    wire pc_work;
+    
+	PC the_PC(clk, next_pc, pc_wr, pc_out, rst,pc_work,pc_en);
 	
 	wire [31:2] pc;
 	wire [15:0] imm_16_in;
@@ -55,7 +58,7 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	wire [20:2] im_addr;
 	wire [31:0] im_dout;
 	//im_2m the_IM(clk, im_addr, im_dout);
-	Im_2m the_IM(.clka(ram_clk), .addra(im_addr[16:2]), .douta(im_dout));
+	//Im_2m the_IM(.clka(ram_clk), .addra(im_addr[16:2]), .douta(im_dout));
 	
 	//////////////////////////////////////////////////Phase D//////////////////////////////
 	
@@ -112,7 +115,8 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	wire [31:0] RegNum1E;
 	wire [31:0] RegNum2E;
 	wire [31:0] Num32E;
-	Reg_E the_RegE(clk, rst, we_e, clear_e, instr_e, PC_e, reg_num1_e, reg_num2_e, num32_e, InstrE, PCE, 			RegNum1E, RegNum2E, Num32E);
+	Reg_E the_RegE(clk, rst, we_e, clear_e, instr_e, PC_e, reg_num1_e, reg_num2_e, num32_e, InstrE, PCE, 			
+    RegNum1E, RegNum2E, Num32E);
 	
 	wire [5:0] opcode_e;
 	wire [4:0] rs_e;
@@ -152,7 +156,8 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	wire IntReq;
 	wire [31:2] EPC_out;
 	wire [31:0] cp0_dout;
-	cp0 the_cp0(clk, rst, cp0_din, pc_in, CP0We_in, hard_int, cp0_sel, EXL_set, EXL_clr, IntReq, EPC_out, 		cp0_dout);
+	cp0 the_cp0(clk, rst, cp0_din, pc_in, CP0We_in, hard_int, cp0_sel, 
+    EXL_set, EXL_clr, IntReq, EPC_out, 		cp0_dout);
 	
 	////////////////////////////////////Phase M/////////////////////////
 	
@@ -199,12 +204,12 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	wire [31:0] dm_din;
 	wire dm_we;
 	wire [31:0] dm_dout;
-	Dm_4k the_DM( .addra(dm_addr), .wea(be_in), .dina(dm_din), .ena(dm_we), .clka(ram_clk), .douta(dm_dout) );
+	//Dm_4k the_DM( .addra(dm_addr), .wea(be_in), .dina(dm_din), .ena(dm_we), .clka(ram_clk), .douta(dm_dout) );
 	//dm_4k the_DM( dm_addr, be_in, dm_din, dm_we, clk, dm_dout );
 	
     
     
-    MEM the_MEM(flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,clk_in,rst_in,dm_addr,dm_work, dm_datain,dm_dataout,im_addr,im_dataout,boot,os,start);
+    MEM the_MEM(flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,ram_clk,rst,{7'h0,dm_addr},dm_work, dm_we,be_in,dm_din,dm_dout,pc_work,{3'h0,im_addr},im_dout,boot,os,start);
 	wire [1:0] me_aluout;
 	wire [2:0] me_op_in;
 	wire [31:0] me_din;
