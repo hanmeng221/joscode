@@ -211,7 +211,7 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	
     
     
-    MEM the_MEM(flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,ram_clk,rst,{7'h0,dm_addr},dm_work, dm_we,be_in,dm_din,dm_dout,pc_work,{3'h0,im_addr},im_dout,boot,os,start);
+    MEM the_MEM(flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,ram_clk,rst,{7'h0,dm_addr},dm_work, dm_we,be_in,dm_din,dm_dout,pc_work,{3'h0,im_addr},im_dout,boot,os,start,uart_rxd,uart_txd);
 	wire [1:0] me_aluout;
 	wire [2:0] me_op_in;
 	wire [31:0] me_din;
