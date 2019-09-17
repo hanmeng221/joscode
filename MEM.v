@@ -69,7 +69,7 @@ mem_if the_mem_if(/*AUTOARG*/
   // Inouts
   flash_dq, sram_dq,
   // Inputs
-  clk_in, rst_in, uart_rxd, mem_flash_cs, mem_flash_rw,
+  clk_in, ~rst_in, uart_rxd, mem_flash_cs, mem_flash_rw,
   mem_flash_addr, mem_flash_data_wr, mem_sram_cs, mem_sram_rw,
   mem_sram_addr, mem_sram_data_wr, flash_rdybsyn, sram_waitn
   );
