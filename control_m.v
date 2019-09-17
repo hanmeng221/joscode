@@ -49,8 +49,8 @@ module Control_M(opcode, rs, rt, funct, now_device, BeOP, MemWrite, IOWrite, MeO
 				(lw) ? `ME_LW :
 				3'b000;
 	
-	assign MemWrite = (stype && now_device == `NOWDEVICE_MEMO) ? 1:0;
-	assign IOWrite = (stype && now_device == `NOWDEVICE_IO) ? 1:0;
+	assign MemWrite = (stype && now_device == `NOWDEVICE_MEMO) ? 1'b1:1'b0;
+	assign IOWrite = (stype && now_device == `NOWDEVICE_IO) ? 1'b1:1'b0;
 	
 endmodule
 

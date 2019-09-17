@@ -64,9 +64,9 @@ module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 		mult_D, multu_D, div_D, divu_D, mthi_D, mtlo_D, mfhi_D, mflo_D,
 		cp0type_D,eret_D, mfc0_D, mtc0_D);
 		
-	assign req_btype_two_D = (beq_D || bne_D) ? 1:0;
-	assign req_btype_one_D = (blez_D || bgtz_D || bltz_D || bgez_D) ? 1:0;
-	assign req_jrtype_D = (jr_D || jalr_D) ? 1:0;
+	assign req_btype_two_D = (beq_D || bne_D) ? 1'b1:1'b0;
+	assign req_btype_one_D = (blez_D || bgtz_D || bltz_D || bgez_D) ? 1'b1:1'b0;
+	assign req_jrtype_D = (jr_D || jalr_D) ? 1'b1:1'b0;
 		
 	////////////////////////////////////////////////Phase E
 	wire [5:0] opcode_E;
@@ -113,19 +113,19 @@ module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 		mult_E, multu_E, div_E, divu_E, mthi_E, mtlo_E, mfhi_E, mflo_E,
 		cp0type_E,eret_E, mfc0_E, mtc0_E);
 	
-	assign req_calctype_E = (!btype_E && !mtype_E && !jtype_E && !mfttype_E && !eret_E) ? 1:0;
-	assign req_rtype_E = (req_calctype_E && rtype_E) ? 1:0;
-	assign req_itype_E = (req_calctype_E && itype_E) ? 1:0;
-	assign req_memtype_E = (mtype_E) ? 1:0;
-	assign req_stype_E = (stype_E) ? 1:0;
-	assign req_hilo_one_E = (mthi_E || mtlo_E) ? 1:0;
-	assign req_hilo_two_E = (mult_E || multu_E || div_E || divu_E) ? 1:0;
-	assign req_CP0_E = (mtc0_E) ? 1:0;
+	assign req_calctype_E = (!btype_E && !mtype_E && !jtype_E && !mfttype_E && !eret_E) ? 1'b1:1'b0;
+	assign req_rtype_E = (req_calctype_E && rtype_E) ? 1'b1:1'b0;
+	assign req_itype_E = (req_calctype_E && itype_E) ? 1'b1:1'b0;
+	assign req_memtype_E = (mtype_E) ? 1'b1:1'b0;
+	assign req_stype_E = (stype_E) ? 1'b1:1'b0;
+	assign req_hilo_one_E = (mthi_E || mtlo_E) ? 1'b1:1'b0;
+	assign req_hilo_two_E = (mult_E || multu_E || div_E || divu_E) ? 1'b1:1'b0;
+	assign req_CP0_E = (mtc0_E) ? 1'b1:1'b0;
 	
 	assign prov_rd_E = (rtype_E || mfhi_E || mflo_E) ? instr_E[15:11] : rt_E;
-	assign prov_jal_E = (jal_E || jalr_E) ? 1:0;
+	assign prov_jal_E = (jal_E || jalr_E) ? 1'b1:1'b0;
 	assign prov_ALUtoReg_E = req_calctype_E;
-	assign prov_mfhilocp0_E = (mfhi_E || mflo_E || mfc0_E) ? 1:0;
+	assign prov_mfhilocp0_E = (mfhi_E || mflo_E || mfc0_E) ? 1'b1:1'b0;
 		
 	//////////////////////////////////////////////////////Phase M
 	
@@ -171,15 +171,15 @@ module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 		mult_M, multu_M, div_M, divu_M, mthi_M, mtlo_M, mfhi_M, mflo_M,
 		cp0type_M,eret_M, mfc0_M, mtc0_M);
 		
-	assign req_store_M = (stype_M) ? 1:0;
+	assign req_store_M = (stype_M) ? 1'b1:1'b0;
 	
 	assign prov_rd_M = (rtype_M || mfhi_M || mflo_M) ? instr_M[15:11] : rt_M;
-	assign prov_ALUtoReg_M = (!btype_M && !mtype_M && !jtype_M && !mfttype_M && !eret_M) ? 1:0;
-	assign prov_MemtoReg_M = (ltype_M) ? 1:0;
-	assign prov_jal_M = (jal_M || jalr_M) ? 1:0;
-	assign prov_HitoReg_M = (mfhi_M) ? 1:0;
-	assign prov_LotoReg_M = (mflo_M) ? 1:0;
-	assign prov_CP0toReg_M = (mfc0_M) ? 1:0;
+	assign prov_ALUtoReg_M = (!btype_M && !mtype_M && !jtype_M && !mfttype_M && !eret_M) ? 1'b1:1'b0;
+	assign prov_MemtoReg_M = (ltype_M) ? 1'b1:1'b0;
+	assign prov_jal_M = (jal_M || jalr_M) ? 1'b1:1'b0;
+	assign prov_HitoReg_M = (mfhi_M) ? 1'b1:1'b0;
+	assign prov_LotoReg_M = (mflo_M) ? 1'b1:1'b0;
+	assign prov_CP0toReg_M = (mfc0_M) ? 1'b1:1'b0;
 		
 	//////////////////////////////////////////////////Phase W
 	
@@ -223,12 +223,12 @@ module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 		cp0type_W,eret_W, mfc0_W, mtc0_W);
 	
 	assign prov_rd_W = (rtype_W || mfhi_W || mflo_W) ? instr_W[15:11] : rt_W;
-	assign prov_ALUtoReg_W = (!btype_W && !mtype_W && !jtype_W && !mfttype_W && !eret_W) ? 1:0;
-	assign prov_MemtoReg_W = (ltype_W) ? 1:0;
-	assign prov_jal_W = (jal_W || jalr_W ) ? 1:0;
-	assign prov_HitoReg_W = (mfhi_W) ? 1:0;
-	assign prov_LotoReg_W = (mflo_W) ? 1:0;
-	assign prov_CP0toReg_W = (mfc0_W) ? 1:0;
+	assign prov_ALUtoReg_W = (!btype_W && !mtype_W && !jtype_W && !mfttype_W && !eret_W) ? 1'b1:1'b0;
+	assign prov_MemtoReg_W = (ltype_W) ? 1'b1:1'b0;
+	assign prov_jal_W = (jal_W || jalr_W ) ? 1'b1:1'b0;
+	assign prov_HitoReg_W = (mfhi_W) ? 1'b1:1'b0;
+	assign prov_LotoReg_W = (mflo_W) ? 1'b1:1'b0;
+	assign prov_CP0toReg_W = (mfc0_W) ? 1'b1:1'b0;
 	
 	/////////////////////////////////////////////////////////////////////////////Sel
 	

@@ -46,11 +46,11 @@ module Control_W(opcode, rs, rt, funct, RegWE, WAdrs, WDataSrc);
 					(mflo)? `WDATA_LO :
 					`WDATA_ALURES;
 	
-	assign RegWE = (!mtype && !btype && !jtype && !eret && !mfttype) ? 1:
-					(jal || jalr) ? 1:
-					(ltype) ? 1:
-					(mfc0 || mfhi || mflo) ? 1:
-					0;
+	assign RegWE = (!mtype && !btype && !jtype && !eret && !mfttype) ? 1'b1:
+					(jal || jalr) ? 1'b1:
+					(ltype) ? 1'b1:
+					(mfc0 || mfhi || mflo) ? 1'b1:
+					1'b0;
 endmodule
 
 

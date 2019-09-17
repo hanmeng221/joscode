@@ -63,7 +63,7 @@ module Control_E(opcode, rs, rt, funct, ALUCommand, ALUSrc, ALUShift, HILOop, HI
 					(lui) ? `ALUSHIFT_16 : 
 					5'd0;
 	
-	assign HILOwe = (mthi|| mtlo || mult || multu || div || divu) ? 1:0;
+	assign HILOwe = (mthi|| mtlo || mult || multu || div || divu) ? 1'b1:1'b0;
 	
 	assign HILOop = (mult) ? `MULT :
 					(multu) ? `MULTU :

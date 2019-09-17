@@ -5,7 +5,7 @@ module Comparer(num1, num2, zero, pos);
 	output zero;
 	output pos;
 	
-	assign zero = (num1 == num2) ? 1:0;
-	assign pos = (num1 > num2 ) ? 1:0;
+	assign zero = (num1 == num2) ? 1'b1:1'b0;
+	assign pos = (num1 > num2 ) ? 1'b1:1'b0;
 
 endmodule
