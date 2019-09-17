@@ -74,8 +74,8 @@ NET "sel1[1]"           LOC = "G17" ;
 
 NET "TxD1"              LOC = "AF17" ;
 
-NET "RxD2" 				LOC = AF16 | IOSTANDARD = LVCMOS33;
-NET "TxD2"	 			LOC = AF15 | IOSTANDARD = LVCMOS33;
+NET "uart_rxd" 				LOC = AF16 | IOSTANDARD = LVCMOS33;
+NET "uart_txd"	 			LOC = AF15 | IOSTANDARD = LVCMOS33;
 
 NET "sram_a[0]"      LOC = N22   | IOSTANDARD = LVCMOS18;
 NET "sram_a[1]"      LOC = P24   | IOSTANDARD = LVCMOS18;

@@ -1,5 +1,5 @@
 
-module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2, TxD1);
+module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2, TxD1,flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,start,uart_rxd,uart_txd);
     input sys_clk;
 	input refresh_clk;
 	input sys_rst;
@@ -9,7 +9,30 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	output [4:1] sel1;
 	output [4:1] sel2;
 	output TxD1;
-	
+    
+	  output flash_cen;
+    output flash_resetn;
+    output flash_oen;
+    output flash_wen;
+    output flash_byten;
+    output [24:0] flash_a;
+    inout [31:0] flash_dq;
+    input flash_rdybsyn;
+    output sram_clk;
+    output sram_cen;
+    output sram_advn;
+    output sram_oen;
+    output sram_wen;
+    output sram_psn;
+    output [21:0] sram_a;
+    inout [31:0] sram_dq;
+    output [7:0] sram_ben;
+    input sram_waitn;
+    output start;
+    
+    input uart_rxd;
+    output uart_txd;
+    
 	wire rst;
 	//wire refresh_clk;
 	//assign refresh_clk = sys_clk;
@@ -22,7 +45,11 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	wire ram_clk;
 	double_clk the_double_clk(sys_clk, clk);
 	assign ram_clk=sys_clk;
-	
+    
+	wire [31:0] switch_din;
+	wire [31:0] switch_dout;
+	Switches switches(switch_din, switch_dout);
+    
 	wire [31:2] CPUAddr;
 	wire [3:0] BE;
 	wire [31:0] CPUIn;
@@ -31,7 +58,7 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	wire clk_out;
 	wire [7:2] HardInt_in;
 	wire [31:2] CPU_PC;
-	mips U_MIPS(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in, CPU_PC);
+	mips U_MIPS(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in, CPU_PC,flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,switch_dout[0],switch_dout[1],start,uart_rxd,uart_txd);
 	
 	wire [31:2] CPU_addr;
 	wire [31:0] CPU_din;
@@ -58,9 +85,7 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	wire IRQ;
 	timecounter U_TIMER(CLK_I, RST_I, ADD_I, WE_I, DAT_I, DAT_O, IRQ, device_BE);
 	
-	wire [31:0] switch_din;
-	wire [31:0] switch_dout;
-	Switches switches(switch_din, switch_dout);
+
 	
 	wire [31:0] numbers_din;
 	wire numbers_we;

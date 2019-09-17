@@ -1,6 +1,6 @@
 `include "../public.v"
 
-module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in, pc_out);
+module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in, pc_out,flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,boot,os,start,uart_rxd,uart_txd);
     input clk ;  // clock
 	input ram_clk;
 	input rst ;   // reset
@@ -14,6 +14,30 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	output clk_out;
 	
 	output [31:2] pc_out;
+    
+     output flash_cen;
+    output flash_resetn;
+    output flash_oen;
+    output flash_wen;
+    output flash_byten;
+    output [24:0] flash_a;
+    inout [31:0] flash_dq;
+    input flash_rdybsyn;
+    output sram_clk;
+    output sram_cen;
+    output sram_advn;
+    output sram_oen;
+    output sram_wen;
+    output sram_psn;
+    output [21:0] sram_a;
+    inout [31:0] sram_dq;
+    output [7:0] sram_ben;
+    input sram_waitn;
+     input boot;
+    input os;
+    output start;
+    input uart_rxd;
+    output uart_txd;
 	////////////////////////////////////////////////////Phase F/////////////////
 	wire [31:2] next_pc;
 	wire pc_wr;
@@ -178,6 +202,9 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	Dm_4k the_DM( .addra(dm_addr), .wea(be_in), .dina(dm_din), .ena(dm_we), .clka(ram_clk), .douta(dm_dout) );
 	//dm_4k the_DM( dm_addr, be_in, dm_din, dm_we, clk, dm_dout );
 	
+    
+    
+    MEM the_MEM(flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,clk_in,rst_in,dm_addr,dm_work, dm_datain,dm_dataout,im_addr,im_dataout,boot,os,start);
 	wire [1:0] me_aluout;
 	wire [2:0] me_op_in;
 	wire [31:0] me_din;
@@ -332,7 +359,7 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	////////////////////////////////////////////Phase E////////////////////////////
 	
 	//Reg_E the_RegE(clk, instr_e, PC_e, reg_num1_e, reg_num2_e, num32_e, InstrE, PCE, RegNum1E, RegNum2E,
-		//Num32E)ï¼	
+		//Num32E)	
 	assign instr_e = InstrD;
 	assign PC_e = PCD;
 	assign reg_num1_e = data1;
