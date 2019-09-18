@@ -72,7 +72,7 @@ NET "sel1[3]"           LOC = "F18" ;
 NET "sel1[2]"           LOC = "C19" ;
 NET "sel1[1]"           LOC = "G17" ;
 
-NET "TxD1"              LOC = "AF17" ;
+NET "TxD1"              LOC = "AF17" |  IOSTANDARD = LVCMOS33;
 
 NET "uart_rxd" 				LOC = AF16 | IOSTANDARD = LVCMOS33;
 NET "uart_txd"	 			LOC = AF15 | IOSTANDARD = LVCMOS33;
