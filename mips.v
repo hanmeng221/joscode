@@ -1,6 +1,6 @@
 `include "../public.v"
 
-module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in, pc_out,flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,boot,os,start,uart_rxd,uart_txd);
+module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in, pc_out,dm_addr,be_in,dm_din,dm_we,dm_dout,dm_cs,im_addr,im_dout,im_cs,mem_en,os);
     input clk ;  // clock
 	input ram_clk;
 	input rst ;   // reset
@@ -15,38 +15,27 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	
 	output [31:2] pc_out;
     
-     output flash_cen;
-    output flash_resetn;
-    output flash_oen;
-    output flash_wen;
-    output flash_byten;
-    output [24:0] flash_a;
-    inout [31:0] flash_dq;
-    input flash_rdybsyn;
-    output sram_clk;
-    output sram_cen;
-    output sram_advn;
-    output sram_oen;
-    output sram_wen;
-    output sram_psn;
-    output [21:0] sram_a;
-    inout [31:0] sram_dq;
-    output [7:0] sram_ben;
-    input sram_waitn;
-     input boot;
+	 
+   output [14:0] dm_addr;
+	output [3:0] be_in;
+	output [31:0] dm_din;
+	output dm_we;
+	input [31:0] dm_dout;
+	output dm_cs;
+	
+	output [20:2] im_addr;
+	input  [31:0] im_dout;
+	output im_cs;
+	input mem_en;
     input os;
-    output start;
-    input uart_rxd;
-    output uart_txd;
 	////////////////////////////////////////////////////Phase F/////////////////
 	wire [31:2] next_pc;
 	wire pc_wr;
-    wire pc_en;
     //TEMP
+	 wire pc_en;
     assign pc_en = 1'b1;
-    wire pc_work;
     
-	PC the_PC(clk, next_pc, pc_wr, pc_out, rst,pc_work,pc_en);
+	PC the_PC(clk, next_pc, pc_wr, pc_out, rst,im_cs,pc_en,os);
 	
 	wire [31:2] pc;
 	wire [15:0] imm_16_in;
@@ -57,8 +46,7 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	wire [31:2] next_pc_out;
 	NextPC the_NextPC(pc, imm_16_in, imm_26_in, reg_32_in, EPC_in, PCSource_in, next_pc_out);
 	
-	wire [20:2] im_addr;
-	wire [31:0] im_dout;
+	
 	//im_2m the_IM(clk, im_addr, im_dout);
 	//Im_2m the_IM(.clka(ram_clk), .addra(im_addr[16:2]), .douta(im_dout));
 	
@@ -190,7 +178,8 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	wire [2:0] meOP_out;
 	wire MemWrite;
 	wire IOWrite;
-	Control_M the_ControllerM(opcode_m, rs_m, rt_m, funct_m, now_device, BeOP_out, MemWrite, IOWrite, meOP_out);
+	wire DMWr_out;
+	Control_M the_ControllerM(clk,opcode_m, rs_m, rt_m, funct_m, now_device, BeOP_out, MemWrite, IOWrite, meOP_out, DMWr_out, dm_cs);
 	
 	wire [31:0] AA_din;
 	wire NowDevice;
@@ -201,17 +190,13 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	wire [3:0] be_out;
 	becalc the_BECalc(be_aluout, be_op_in, be_out);
 	
-	wire [14:0] dm_addr;
-	wire [3:0] be_in;
-	wire [31:0] dm_din;
-	wire dm_we;
-	wire [31:0] dm_dout;
+
 	//Dm_4k the_DM( .addra(dm_addr), .wea(be_in), .dina(dm_din), .ena(dm_we), .clka(ram_clk), .douta(dm_dout) );
 	//dm_4k the_DM( dm_addr, be_in, dm_din, dm_we, clk, dm_dout );
 	
     
     
-    MEM the_MEM(flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,ram_clk,rst,{7'h0,dm_addr},dm_work, dm_we,be_in,dm_din,dm_dout,pc_work,{3'h0,im_addr},im_dout,boot,os,start,uart_rxd,uart_txd);
+   
 	wire [1:0] me_aluout;
 	wire [2:0] me_op_in;
 	wire [31:0] me_din;
@@ -261,11 +246,12 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	wire [3:0] Sel_CP0, Sel_Hi, Sel_Lo, Sel_CPUout;
 	wire we_D, we_E, we_M, clear_D, clear_E, clear_M;
 	wire PCWr_out;		
+	
 	HazardHandler the_HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 					Sel_PCR, Sel_CmpA, Sel_CmpB, Sel_ALUA, Sel_ALUB, Sel_MemoData, Sel_RegNum2M,
 					Sel_CP0, Sel_Hi, Sel_Lo, Sel_CPUout,
-					we_D, we_E, we_M, clear_D, clear_E, clear_M, PCWr_out,
-					EXLSet, EXLClr, ERR_PCReady, ERET_PCReady);
+					we_D, we_E, we_M, clear_D, clear_E, clear_M, PCWr_out,DMWr_out,
+					EXLSet, EXLClr, ERR_PCReady, ERET_PCReady,mem_en);
 
 	
 	///////////////////////////////////Phase F//////////////////////
@@ -280,7 +266,7 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	///////////////////////////////////////////Phase D/////////////////////////////
 	
 	//Reg_D the_RegD(clk, rst, we_d, clear_d, instr_d, PC_d, InstrD, PCD);
-	assign instr_d = im_dout;
+	assign instr_d = os == 1'b1 ? im_dout: 32'b0;
 	assign PC_d = pc_out+2;
 	assign we_d = we_D;
 	assign clear_d = clear_D;
@@ -595,6 +581,8 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 				(Sel_MemoData == `SEL_FROMW_CP0) ? CP0outW :
 				RegNum2M;
 	assign IOWe = IOWrite;
+	
+	
 	assign clk_out = clk;
 	//always @(clk)
 	//$display ("%b, pc= %h, if= %h, id= %h, ie= %h, im= %h, iw= %h, a= %h, b= %h, c= %h, clast= %h, dmaddr= %h, din= %h, dout= %h, addr= %h, IOWe= %h, CPUOut= %h, CPUAddr= %h",

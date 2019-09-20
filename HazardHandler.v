@@ -3,12 +3,13 @@
 module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req, 
 					Sel_PCR, Sel_CmpA, Sel_CmpB, Sel_ALUA, Sel_ALUB, Sel_MemoData, Sel_RegNum2M, 
 					Sel_CP0, Sel_Hi, Sel_Lo, Sel_CPUout,
-					we_D, we_E, we_M, clear_D, clear_E, clear_M, PCWr, 
-					EXLSet, EXLClr, ERR_PCReady, ERET_PCReady);
+					we_D, we_E, we_M, clear_D, clear_E, clear_M, PCWr, DMWr,
+					EXLSet, EXLClr, ERR_PCReady, ERET_PCReady,mem_en);
 
     input [31:0] instr_D, instr_E, instr_M, instr_W;
 	input branch_ok_D;
 	input int_req;
+	input mem_en;
 	
 	output [3:0] Sel_PCR, Sel_CmpA, Sel_CmpB, Sel_ALUA, Sel_ALUB;
 	output [3:0] Sel_MemoData, Sel_RegNum2M;
@@ -16,12 +17,13 @@ module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 	output we_D, we_E, we_M;
 	output clear_D, clear_E, clear_M;
 	output PCWr;
+	output DMWr;
 	
 	output EXLSet, EXLClr, ERR_PCReady, ERET_PCReady;
 	
 	reg we_D, we_E, we_M, we_W;
 	reg clear_D, clear_E, clear_M, clear_W;
-	reg PCWr;
+	reg PCWr,DMWr;
 	reg EXLSet, EXLClr;
 	
 	////////////////////////////////////////////////////////////////Phase D
@@ -402,6 +404,22 @@ module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 	
 	always@(*)
 	begin
+	   if (mem_en == 1'b0) begin
+			PCWr =0;
+			DMWr =0;
+			clear_D = 0;
+			clear_E = 0;
+			clear_M = 0;
+			clear_W = 0;
+			we_D = 0;
+			we_E = 0;
+			we_M = 0;
+			we_W = 0;
+			EXLSet = 0;
+			EXLClr = 0;
+		end else
+		begin
+		DMWr = 1'b1;
 		if(req_rtype_E && prov_MemtoReg_M && (rs_E == prov_rd_M || rt_E == prov_rd_M)) //XXX ADD LW
 		begin
 		    PCWr = 0;
@@ -641,7 +659,7 @@ module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 			    
 			end
 		end
-		
+		end
 	end
 	
 	assign ERR_PCReady = EXLSet;

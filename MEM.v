@@ -49,17 +49,67 @@ module MEM(
     input [21:0] im_addr,
     output [31:0] im_dataout,
     input boot,
-    input os,
     output start,
     input uart_rxd,
-    output uart_txd
+    output uart_txd,
+	 output en
     );
 
 //TODO dm_we mem_sram_rw
+wire               mem_flash_cs;
+wire               mem_flash_rw;
+wire  [25-1:0]     mem_flash_addr;
+wire  [32-1:0]     mem_flash_data_wr;
+wire  [32-1:0]     mem_flash_data_rd;
+wire               mem_flash_done;
+  
+  // sram if to cpu
+wire               mem_sram_cs;
+wire               mem_sram_rw;
+wire [22-1:0]      mem_sram_addr;
+wire [32-1:0]      mem_sram_data_wr;
+wire [32-1:0]     mem_sram_data_rd;
+wire              mem_sram_done;
+  
+assign mem_flash_rw = 1'b1;//read
+assign mem_flash_data_wr = 32'b0;
 
-deliver the_deliver(clk_in,rst_in,boot,mem_flash_done,mem_flash_data_rd,mem_flash_addr,mem_flash_cs,mem_sram_done,mem_sram_data_wr,mem_sram_addr,mem_sram_cs,start);
+wire memcs;
+wire [21:0] memaddr;
+wire [31:0] memdatawrite;
+wire [31:0] memdataread = mem_sram_data_rd;
+wire memdone = mem_sram_done;
+wire deliver_memcs;
 
+wire memrw; 
+wire [21:0] deliver_mem_sram_addr;
+wire [31:0] deliver_mem_sram_data_wr;
 
+wire [3:0] sram_bin;
+
+wire im_cs;
+wire dm_cs;
+
+deliver the_deliver(clk_in,rst_in,boot,mem_flash_done,mem_flash_data_rd,mem_flash_addr,mem_flash_cs,mem_sram_done,deliver_mem_sram_data_wr,deliver_mem_sram_addr,deliver_memcs,start);
+
+double_if the_double_if(
+	 clk_in,rst_in,
+    im_addr,im_dataout,32'b0,im_work,1'b1,4'b1111,//1'b1 means read ?
+    dm_addr,dm_dataout,dm_datain,dm_work,dm_we,be_in,
+    memaddr,mem_sram_data_rd,memdatawrite,memcs,memrw,sram_bin,mem_sram_done,
+    en);
+	 
+	 
+Justdgement the_Justdgement(
+//signal
+	start,
+//deliver
+	deliver_mem_sram_addr,deliver_mem_sram_data_wr,deliver_memcs,1'b0,
+//double
+	memaddr,memdatawrite,memcs,memrw,
+//mem_if
+	mem_sram_addr,mem_sram_data_wr,mem_sram_cs,mem_sram_rw
+);
 mem_if the_mem_if(/*AUTOARG*/
   // Outputs
   uart_txd, mem_flash_data_rd, mem_flash_done, mem_sram_data_rd,

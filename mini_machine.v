@@ -58,7 +58,19 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	wire clk_out;
 	wire [7:2] HardInt_in;
 	wire [31:2] CPU_PC;
-	mips U_MIPS(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in, CPU_PC,flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,switch_dout[0],switch_dout[1],start,uart_rxd,uart_txd);
+	
+	wire [14:0] dm_addr;
+	wire  [3:0] be_in;
+	wire [31:0] dm_din;
+	wire dm_we;
+	wire  [31:0] dm_dout;
+	wire  dm_cs;
+	
+	wire  [20:2] im_addr;
+	wire  [31:0] im_dout;
+	wire im_cs;
+	wire mem_en;
+	mips U_MIPS(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in, CPU_PC,dm_addr,be_in,dm_din,dm_we,dm_dout,dm_cs,im_addr,im_dout,im_cs,mem_en,switch_dout[1] &start );
 	
 	wire [31:2] CPU_addr;
 	wire [31:0] CPU_din;
@@ -85,8 +97,6 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	wire IRQ;
 	timecounter U_TIMER(CLK_I, RST_I, ADD_I, WE_I, DAT_I, DAT_O, IRQ, device_BE);
 	
-
-	
 	wire [31:0] numbers_din;
 	wire numbers_we;
 	Numbers numbers(refresh_clk, numbers_din, numbers_we, dout1, dout2, sel1, sel2);
@@ -97,11 +107,9 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	wire uart_tx_done;
 	RS232_output U_UART(refresh_clk, ~rst, uart_senden, uart_send, uart_tx, uart_tx_done);
 	
-	//mips U_MIPS(clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in);
 	assign CPUIn = CPU_dout;
 	assign HardInt_in = {5'b0, IRQ};
 	
-	//Bridge (CPU_addr, CPU_din, CPUWe, CPU_be, CPU_dout, deviceCounter_din, deviceSwitch_din, device_addr, device_dout, weCounter, weNumber, weUART, device_BE);
 	
 	assign CPU_addr = CPUAddr;
 	assign CPU_din = CPUOut;
@@ -112,30 +120,25 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	
 	assign CPUPC=CPU_PC;
 	
-	//timecounter U_TIMER(CLK_I, RST_I, ADD_I, WE_I, DAT_I, DAT_O, IRQ)
 	assign CLK_I = clk_out;
 	assign RST_I = rst;
 	assign ADD_I = device_addr[3:2];
 	assign WE_I = weCounter;
 	assign DAT_I = device_dout;
 	
-	//Switches switches(switch_din, switch_dout);
 	assign switch_din = din;
-	
-	//Numbers numbers(clk, numbers_din, numbers_we, dout1, dout2, sel1, sel2);
-	
-	//assign numbers_din = device_dout;
-	//assign numbers_we = weNumber;
 	assign numbers_din = DigitNumber;
 	assign numbers_we = 1'b1;
 	
-	//RS232_output U_UART(clk, rst, uart_senden, uart_send, uart_tx, uart_tx_done);
 	assign uart_senden = weUART;
 	assign uart_send = device_dout[7:0];
 	assign TxD1 = uart_tx;
-	//always @(clk)
-	//$display ("%b, pc= %h, if= %h, id= %h, ie= %h, im= %h, iw= %h, sp= %h, we= %h, dmaddr= %h, din= %h, dout= %h, ra= %h",
-	//		  clk ,U_MIPS.pc_out<<2,U_MIPS.im_dout ,U_MIPS.InstrD ,U_MIPS.InstrE ,U_MIPS.InstrM ,U_MIPS.InstrW,U_MIPS.the_RegFile.register[29],U_MIPS.dm_we,U_MIPS.dm_addr,U_MIPS.dm_din,U_MIPS.dm_dout,U_MIPS.the_RegFile.register[31]);
+	wire pc_work,dm_work;
+	assign pc_work = im_cs;
+	assign dm_work = dm_cs;
+	
+ MEM the_MEM(flash_cen,flash_resetn,flash_oen,flash_wen,flash_byten,flash_a,flash_dq,flash_rdybsyn,sram_clk,sram_cen,sram_advn,sram_oen,sram_wen,sram_psn,sram_a,sram_dq,sram_ben,sram_waitn,ram_clk,rst,{7'h0,dm_addr},dm_work, dm_we,be_in,dm_din,dm_dout,pc_work,{3'h0,im_addr},im_dout,switch_dout[0],start,uart_rxd,uart_txd,mem_en);
+ 
 endmodule
 
 

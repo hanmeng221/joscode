@@ -37,14 +37,14 @@ module deliver(
 	 reg [31:0] instCount;
 	 reg [31:0] dataCount;
 	 
-	 reg [4:0] DeliverState  /* synthesis preserve = 1 */;
+	 reg [4:0] DeliverState;
 	 reg [4:0] State;
 	 
 	 reg [31:0] instSize;
 	 reg [31:0] dataSize;
 	 
-	 reg [21:0] instAddr;
-	 reg [21:0] dataAddr;
+	 reg [31:0] instAddr;
+	 reg [31:0] dataAddr;
 	 
 	 
 	 reg [24:0] preflashAddr;
@@ -70,11 +70,11 @@ module deliver(
 			sramCs = 1'b0;
 			flashCs = 1'b0;
 			
-			instAddr = 21'b0;
-			dataAddr = 21'b0;
+			instAddr = 32'b0;
+			dataAddr = 32'b0;
 			
 			preflashAddr = 25'b0;
-			led = 1'b1;
+			led = 1'b0;
 		end else
 		begin
             State = DeliverState;
@@ -97,7 +97,7 @@ module deliver(
 				flashCs = 1'b0;
 				if(flashReady)
 				begin
-					instAddr = flashData[21:0];
+					instAddr = flashData;
 					flashCs = 1'b1;
 					DeliverState = 5'd3;
 					flashAddr = 1;
@@ -127,7 +127,7 @@ module deliver(
 				flashCs = 1'b0;
 				if(flashReady)
 				begin
-					dataAddr = flashData[21:0];
+					dataAddr = flashData;
 					flashCs = 1'b1;
 					DeliverState = 5'd7;
 					flashAddr = 3;
@@ -174,7 +174,7 @@ module deliver(
 				begin
 					sramCs = 1'b1;
 					sramData = flashData;
-					sramAddr = instAddr + instCount[21:0];
+					sramAddr = instAddr[21:0] + instCount[21:0];
 					instCount = instCount + 1'b1;
                     DeliverState = 5'd12;
 				end
@@ -221,9 +221,8 @@ module deliver(
 				flashCs = 1'b0;
 				if(flashReady)
 				begin
-					sramCs = 1'b1;
 					sramData = flashData;
-					sramAddr = dataAddr + dataCount[21:0];
+					sramAddr = dataAddr[21:0] + dataCount[21:0];
 					dataCount = dataCount + 1'b1;
                     DeliverState = 5'd17;
 				end
@@ -235,13 +234,18 @@ module deliver(
 				else
 					DeliverState = 5'd14;
             end
-			5'd18://end
+			5'd18://check sram_state
 			begin
-				//led on
-				led = 1'b0;
+				if(sramReady)
+				begin
+					DeliverState = 5'd19;
+				end
+			end
+			5'd19:
+			begin
+				led = 1'b1;
 			end
 			endcase
-            
 		end
 	end
 endmodule
