@@ -1,5 +1,5 @@
 #ChipScope Core Generator Project File Version 3.0
-#Mon Sep 23 15:29:50 UTC 2019
+#Mon Sep 23 20:05:49 UTC 2019
 SignalExport.clockChannel=CLK
 SignalExport.dataChannel<0000>=DATA[0]
 SignalExport.dataChannel<0001>=DATA[1]
@@ -63,14 +63,13 @@ SignalExport.dataChannel<0058>=DATA[58]
 SignalExport.dataChannel<0059>=DATA[59]
 SignalExport.dataChannel<0060>=DATA[60]
 SignalExport.dataChannel<0061>=DATA[61]
-SignalExport.dataChannel<0062>=DATA[62]
-SignalExport.dataChannel<0063>=DATA[63]
 SignalExport.dataEqualsTrigger=false
-SignalExport.dataPortWidth=64
+SignalExport.dataPortWidth=62
 SignalExport.triggerChannel<0000><0000>=TRIG0[0]
+SignalExport.triggerChannel<0000><0001>=TRIG0[1]
 SignalExport.triggerPort<0000>.name=TRIG0
 SignalExport.triggerPortCount=1
 SignalExport.triggerPortIsData<0000>=false
-SignalExport.triggerPortWidth<0000>=1
+SignalExport.triggerPortWidth<0000>=2
 SignalExport.type=ila
 
