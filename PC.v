@@ -15,22 +15,20 @@ module PC(clk, next_pc, pc_wr, pc_out, reset, pc_work,pc_en,os);
 	always@(posedge clk)
 	begin
 	    if(reset)
-        begin
+       begin
 		    pc_out <= 30'hbff ;
 			 pc_work <= 1'b0;
-        end
-			//pc_out <= 30'h8000_0000 >>2 ;
-		else if (os == 1'b0)
-		begin
+       end else if (os == 1'b0)
+		 begin
 			pc_out <= 30'hbff;
 			pc_work <= 1'b0;
-		end else if(pc_wr & pc_en)
-      begin
+		 end else if(pc_wr & pc_en)
+       begin
 		    pc_out <= next_pc;
           pc_work <= 1'b1;
-		end else begin
+		 end else begin
 			pc_work <= 1'b0;
-		end
+		 end
 	end
 
 endmodule

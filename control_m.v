@@ -14,10 +14,9 @@ module Control_M(clk,opcode, rs, rt, funct, now_device, BeOP, MemWrite, IOWrite,
 	output [1:0] BeOP;
 	output [2:0] MeOP;
 	
-	output reg dm_work;
+	output  dm_work;
 	input DMWr_out;
 	
-	initial dm_work = 1'b0;
 		
 	wire rtype, itype, btype, mtype, jtype, stype, ltype, mfttype;
 	wire add, addu, sub, subu, sll, srl, sra, sllv, srlv, srav, and1, or1, xor1, nor1, slt, sltu;
@@ -55,19 +54,21 @@ module Control_M(clk,opcode, rs, rt, funct, now_device, BeOP, MemWrite, IOWrite,
 				(lhu) ? `ME_LHU :
 				(lw) ? `ME_LW :
 				3'b000;
+				
+	wire MemRead;
+	reg DMWr_out_clk;
 	
 	assign MemWrite = (stype && now_device == `NOWDEVICE_MEMO) ? 1'b1:1'b0;
 	assign MemRead = (ltype && now_device == `NOWDEVICE_MEMO) ? 1'b1:1'b0;
 	assign IOWrite = (stype && now_device == `NOWDEVICE_IO) ? 1'b1:1'b0;
 	
-	always@(posedge clk)
+	assign dm_work = (MemWrite |  MemRead) && DMWr_out_clk;
+	
+	always@(posedge clk )
 	begin
-		if ((MemWrite | MemRead) && DMWr_out )begin
-			dm_work  = 1'b1;
-		end else begin
-			dm_work = 1'b0;
-		end
+		DMWr_out_clk = DMWr_out;
 	end
+	
 endmodule
 
 

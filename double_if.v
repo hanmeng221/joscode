@@ -40,6 +40,8 @@ module double_if(
 	 
 	 reg [3:0] temp_data_bin1;
 	 reg [3:0] temp_data_bin2;
+	 
+	 
 	 always @(posedge clk or negedge clk)
     begin
         if (rst)

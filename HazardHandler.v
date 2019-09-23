@@ -1,11 +1,11 @@
 `include "../../public.v"
 
-module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req, 
+module HazardHandler(clk,instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req, 
 					Sel_PCR, Sel_CmpA, Sel_CmpB, Sel_ALUA, Sel_ALUB, Sel_MemoData, Sel_RegNum2M, 
 					Sel_CP0, Sel_Hi, Sel_Lo, Sel_CPUout,
 					we_D, we_E, we_M, clear_D, clear_E, clear_M, PCWr, DMWr,
 					EXLSet, EXLClr, ERR_PCReady, ERET_PCReady,mem_en);
-
+	input clk;
     input [31:0] instr_D, instr_E, instr_M, instr_W;
 	input branch_ok_D;
 	input int_req;
@@ -402,7 +402,7 @@ module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 					(rt_M == prov_rd_W && prov_CP0toReg_W) ? `SEL_FROMW_CP0 :
 					`SEL_NORMAL;
 	
-	always@(*)
+	always@(posedge clk or negedge clk)
 	begin
 	   if (mem_en == 1'b0) begin
 			PCWr =0;
@@ -422,7 +422,7 @@ module HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 		DMWr = 1'b1;
 		if(req_rtype_E && prov_MemtoReg_M && (rs_E == prov_rd_M || rt_E == prov_rd_M)) //XXX ADD LW
 		begin
-		    PCWr = 0;
+		   PCWr = 0;
 			clear_D = 0;
 			clear_E = 0;
 			clear_M = 1;

@@ -31,11 +31,8 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	////////////////////////////////////////////////////Phase F/////////////////
 	wire [31:2] next_pc;
 	wire pc_wr;
-    //TEMP
-	 wire pc_en;
-    assign pc_en = 1'b1;
     
-	PC the_PC(clk, next_pc, pc_wr, pc_out, rst,im_cs,pc_en,os);
+	PC the_PC(clk, next_pc, pc_wr , pc_out, rst,im_cs,mem_en,os);
 	
 	wire [31:2] pc;
 	wire [15:0] imm_16_in;
@@ -247,7 +244,7 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	wire we_D, we_E, we_M, clear_D, clear_E, clear_M;
 	wire PCWr_out;		
 	
-	HazardHandler the_HazardHandler(instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
+	HazardHandler the_HazardHandler(ram_clk,instr_D, instr_E, instr_M, instr_W, branch_ok_D, int_req,
 					Sel_PCR, Sel_CmpA, Sel_CmpB, Sel_ALUA, Sel_ALUB, Sel_MemoData, Sel_RegNum2M,
 					Sel_CP0, Sel_Hi, Sel_Lo, Sel_CPUout,
 					we_D, we_E, we_M, clear_D, clear_E, clear_M, PCWr_out,DMWr_out,
@@ -268,8 +265,8 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	//Reg_D the_RegD(clk, rst, we_d, clear_d, instr_d, PC_d, InstrD, PCD);
 	assign instr_d = os == 1'b1 ? im_dout: 32'b0;
 	assign PC_d = pc_out+2;
-	assign we_d = we_D;
-	assign clear_d = clear_D;
+	assign we_d = we_D & mem_en;
+	assign clear_d = clear_D & mem_en;
 	
 	//Control_D the_ControllerD(opcode_d, rs_d, rt_d, funct_d, err_PC_ready, eret_PC_ready, ExtSign, PCSource_out, Cmp2Source, BranchOK, zero, pos)
 	assign opcode_d = InstrD[31:26];
@@ -358,8 +355,8 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	assign reg_num1_e = data1;
 	assign reg_num2_e = data2;
 	assign num32_e = num_32;
-	assign we_e = we_E;
-	assign clear_e = clear_E;
+	assign we_e = we_E & mem_en;
+	assign clear_e = clear_E & mem_en;
 	
 	//Control_E the_ControllerE(opcode_e, rs_e, rt_e, funct_e, ALUCommand, ALUSrc, ALUShift_out, HILOop, HILOwe);
 	assign opcode_e = InstrE[31:26];
@@ -468,8 +465,8 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	assign CP0We_in = CP0We;
 	assign hard_int = HardInt_in;
 	assign cp0_sel = InstrE[15:11];
-	assign EXL_set = EXLSet;
-	assign EXL_clr = EXLClr;
+	assign EXL_set = EXLSet & mem_en;
+	assign EXL_clr = EXLClr & mem_en;
 	
 	////////////////////////////////////////////Phase M//////////////////////
 	
@@ -490,8 +487,8 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	assign hiout_m = Hi_out;
 	assign loout_m = Lo_out;
 	assign cp0out_m = cp0_dout;
-	assign we_m = we_M;
-	assign clear_m = clear_M;
+	assign we_m = we_M & mem_en;
+	assign clear_m = clear_M & mem_en;
 	
 	//Control_M the_ControllerM(opcode_m, rs_m, rt_m, funct_m, now_device, BeOP, MemWrite, IOWrite, meOP_out);
 	assign opcode_m = InstrM[31:26];
@@ -519,7 +516,7 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 				(Sel_MemoData == `SEL_FROMW_CP0) ? CP0outW :
 				RegNum2M;
 				
-	assign dm_we = MemWrite;
+	assign dm_we = ~MemWrite;
 	
 	//MemExtender the_MemExtender(me_aluout, me_op_in, me_din, me_dout);
 	assign me_aluout = AluOutM[1:0];

@@ -119,11 +119,12 @@ module testBench;
 		#24 force flash_dq = 32'h340d0005;
 		#24 force flash_dq = 32'h014b4820;
 		#21 din[1] = 1;
-		#11 force sram_dq = 32'h34090001;
+		#11 force sram_dq = 32'h8c080000;
+		#16 force sram_dq = 32'h34090001;
 		#16 force sram_dq = 32'h340a0002;
+		#16 force sram_dq = 32'h21080001;
 		#16 force sram_dq = 32'h340c0004;
-		#16 force sram_dq = 32'h340d0005;
-		#16 force sram_dq = 32'h014b4820;
+		#16 force sram_dq = 32'hac090000;
 	end
 	always #1 sys_clk = ~ sys_clk;
 	
