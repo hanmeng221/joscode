@@ -70,7 +70,8 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	wire  [31:0] im_dout;
 	wire im_cs;
 	wire mem_en;
-	mips U_MIPS(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in, CPU_PC,dm_addr,be_in,dm_din,dm_we,dm_dout,dm_cs,im_addr,im_dout,im_cs,mem_en,switch_dout[1] &start );
+	wire uart_tx_done;
+	mips U_MIPS(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt_in, CPU_PC,dm_addr,be_in,dm_din,dm_we,dm_dout,dm_cs,im_addr,im_dout,im_cs,mem_en & uart_tx_done,switch_dout[1] &start );
 	
 	wire [31:2] CPU_addr;
 	wire [31:0] CPU_din;
@@ -87,6 +88,9 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	wire [3:0] device_BE;
 	wire [31:2] CPUPC;
 	wire [31:0] DigitNumber;
+	
+	UART_DETECT the_UART_DETECT(clk,rst,IOWe,CPUAddr,uartEn);
+	
 	Bridge U_BRIDGE(CPU_addr, CPU_din, CPUWe, CPU_be, CPU_dout, deviceCounter_din, deviceSwitch_din, device_addr, device_dout, weCounter, weNumber, weUART, device_BE, CPUPC, DigitNumber);
 	
 	wire CLK_I, RST_I;
@@ -104,8 +108,7 @@ module mini_machine(sys_clk, refresh_clk, sys_rst, din, dout1, dout2, sel1, sel2
 	wire uart_senden;
 	wire [7:0] uart_send;
 	wire uart_tx;
-	wire uart_tx_done;
-	RS232_output U_UART(refresh_clk, ~rst, uart_senden, uart_send, uart_tx, uart_tx_done);
+	RS232_output U_UART(sys_clk, ~rst, uartEn, dm_din[7:0], uart_tx, uart_tx_done);
 	
 	assign CPUIn = CPU_dout;
 	assign HardInt_in = {5'b0, IRQ};

@@ -69,6 +69,7 @@ module Control_M(clk,opcode, rs, rt, funct, now_device, BeOP, MemWrite, IOWrite,
 		DMWr_out_clk = DMWr_out;
 	end
 	
+	
 endmodule
 
 

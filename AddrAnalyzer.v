@@ -5,6 +5,6 @@ module AddrAnalyzer(din, NowDevice);
 	
 	assign NowDevice = (din >= 'h0000_0000 && din <= 'h0000_2FFF) ? `NOWDEVICE_MEMO : 
 						(din >= 'h0000_7F00 && din <= 'h0000_7FE0) ? `NOWDEVICE_IO :
-						'b0;
+						'b1;
 
 endmodule

@@ -505,7 +505,7 @@ module mips(clk,ram_clk, rst, CPUAddr, BE, CPUIn, CPUOut, IOWe, clk_out, HardInt
 	assign AA_din = AluOutM; 
 	
 	//dm_4k the_DM( dm_addr, be_in, dm_din, dm_we, clk, dm_dout );
-	assign dm_addr = {AluOutM[14:2],2'b00};
+	assign dm_addr = {2'b00,AluOutM[14:2]};
 	assign be_in = be_out;
 	assign dm_din = (Sel_MemoData == `SEL_FROMW_PC) ? PCW<<2 :
 				(Sel_MemoData == `SEL_FROMW_ALU) ? AluOutW :

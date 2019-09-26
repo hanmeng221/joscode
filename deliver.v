@@ -221,6 +221,7 @@ module deliver(
 				flashCs = 1'b0;
 				if(flashReady)
 				begin
+					sramCs = 1'b1;
 					sramData = flashData;
 					sramAddr = dataAddr[21:0] + dataCount[21:0];
 					dataCount = dataCount + 1'b1;
